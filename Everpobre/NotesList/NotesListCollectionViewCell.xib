@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.9"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,6 +18,9 @@
                 <rect key="frame" x="0.0" y="0.0" width="100" height="150"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Gss-PY-y5d">
+                        <rect key="frame" x="0.0" y="0.0" width="100" height="150"/>
+                    </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Gm-IN-Zhh">
                         <rect key="frame" x="33.5" y="64.5" width="33.5" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -36,15 +39,20 @@
                 <constraint firstItem="US5-zm-ux3" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="FTy-1J-dIM"/>
                 <constraint firstItem="3Gm-IN-Zhh" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="SZh-Rh-vdP"/>
                 <constraint firstAttribute="bottom" secondItem="US5-zm-ux3" secondAttribute="bottom" constant="20" id="Sfq-Iy-OZO"/>
+                <constraint firstItem="Gss-PY-y5d" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Wr3-XY-BaE"/>
+                <constraint firstItem="Gss-PY-y5d" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="Xhu-M2-vkf"/>
                 <constraint firstItem="3Gm-IN-Zhh" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="iKL-MG-cjY"/>
+                <constraint firstAttribute="trailing" secondItem="Gss-PY-y5d" secondAttribute="trailing" id="jIh-wU-KZU"/>
+                <constraint firstAttribute="bottom" secondItem="Gss-PY-y5d" secondAttribute="bottom" id="vNN-fY-BLv"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="127" height="183"/>
             <connections>
                 <outlet property="creationDateLabel" destination="US5-zm-ux3" id="9U8-hV-gSL"/>
+                <outlet property="imageView" destination="Gss-PY-y5d" id="nCN-2r-I26"/>
                 <outlet property="titleLabel" destination="3Gm-IN-Zhh" id="Rlv-Hc-ukA"/>
             </connections>
-            <point key="canvasLocation" x="24" y="118"/>
+            <point key="canvasLocation" x="24" y="117.84107946026987"/>
         </collectionViewCell>
     </objects>
 </document>

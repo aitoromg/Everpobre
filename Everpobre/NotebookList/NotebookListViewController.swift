@@ -52,6 +52,11 @@ class NotebookListViewController: UIViewController {
 		navigationController?.navigationItem.largeTitleDisplayMode = .always
 		
 		super.viewDidLoad()
+        
+        let addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNotebook))
+        
+        let exportButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(exportNotebooks))
+        navigationItem.rightBarButtonItems = [addButtonItem, exportButtonItem]
 
 		configureSearchController()
 		showAll()
@@ -165,6 +170,24 @@ class NotebookListViewController: UIViewController {
 
 		present(alert, animated: true)
 	}
+    
+    @objc private func exportNotebooks() {
+        var results: [Notebook] = []
+        do {
+            results = try self.coredataStack.managedContext.fetch(Notebook.fetchRequest())
+            
+        } catch let error as NSError {
+            print("Error: \(error.localizedDescription)")
+        }
+        
+        var csv = ""
+        for notebook in results {
+            csv = "\(csv)\(notebook.csv())\n"
+        }
+        
+        let activityView = UIActivityViewController(activityItems: [csv], applicationActivities: nil)
+        self.present(activityView, animated: true)
+    }
 }
 
 // MARK:- UITableViewDataSource implementation
@@ -237,8 +260,11 @@ extension NotebookListViewController: UITableViewDelegate {
 		let notebook = fetchedResultsController.object(at: indexPath)
 
 		//let notesListVC = NotesListViewController(notebook: notebook, managedContext: managedContext)
-		let notesListVC = NewNotesListViewController(notebook: notebook, coreDataStack: coredataStack)
-		show(notesListVC, sender: nil)
+		//let notesListVC = NewNotesListViewController(notebook: notebook, coreDataStack: coredataStack)
+		//show(notesListVC, sender: nil)
+        
+        let tabBarVC = NotesListTabBarController(notebook: notebook, coredataStack: coredataStack)
+        self.navigationController?.pushViewController(tabBarVC, animated: true)
 	}
 
 	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

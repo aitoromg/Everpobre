@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import MapKit
 
 // MARK:- NoteDetailsViewControllerProtocol
 
@@ -39,6 +40,7 @@ class NoteDetailsViewController: UIViewController {
 	let kind: Kind
 
 	weak var delegate: NoteDetailsViewControllerProtocol?
+    var coordinate: CLLocationCoordinate2D?
 
 	// MARK: Init
 
@@ -104,6 +106,17 @@ class NoteDetailsViewController: UIViewController {
 				imageData = NSData(data: data)
 			} else { imageData = nil }
 			note.image = imageData
+            
+            if let coordinate = coordinate {
+                if let location = note.location {
+                    location.longitude = coordinate.longitude
+                    location.latitude = coordinate.latitude
+                } else {
+                    note.location = Location(context: managedContext)
+                    note.location?.longitude = coordinate.longitude
+                    note.location?.latitude = coordinate.latitude
+                }
+            }
 
 			return note
 		}
@@ -143,7 +156,7 @@ class NoteDetailsViewController: UIViewController {
 
 // MARK:- UIImagePickerControllerDelegate & related methods
 
-extension NoteDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension NoteDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate, NoteMapViewControllerDelegate {
 	func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
 		dismiss(animated: true, completion: nil)
 	}
@@ -178,6 +191,10 @@ extension NoteDetailsViewController: UIImagePickerControllerDelegate, UINavigati
 
 		dismiss(animated: true, completion: nil)
 	}
+    
+    func didChangeLocation(coordinate: CLLocationCoordinate2D) {
+        self.coordinate = coordinate
+    }
 
 	private func showPhotoMenu() {
 		let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
@@ -207,6 +224,21 @@ extension NoteDetailsViewController: UIImagePickerControllerDelegate, UINavigati
 		imagePicker.allowsEditing = true
 		present(imagePicker, animated: true, completion: nil)
 	}
+    
+    @IBAction func openMap(_ sender: Any) {
+        var location: Location?
+        switch(kind) {
+        case .existing(let note):
+            location = note.location
+            
+        case .new:
+            location = nil
+        }
+        let mapViewController = NoteMapViewController(location: location)
+        mapViewController.delegate = self
+        
+        self.navigationController?.pushViewController(mapViewController, animated: true)
+    }
 }
 
 // MARK:- NoteDetailsViewController.Kind extension
@@ -220,9 +252,9 @@ private extension NoteDetailsViewController.Kind {
 	var title: String {
 		switch self {
 		case .existing:
-			return "Detalle"
+			return "Detail"
 		case .new:
-			return "Nueva Nota"
+			return "New note"
 		}
 	}
 }

@@ -18,7 +18,7 @@ class NewNotesListViewController: UIViewController {
 
 	let notebook: Notebook
 	//let managedContext: NSManagedObjectContext
-	let coreDataStack: CoreDataStack!
+	let coredataStack: CoreDataStack!
 
 	var notes: [Note] = [] {
 		didSet {
@@ -30,11 +30,13 @@ class NewNotesListViewController: UIViewController {
 
 	// MARK: Init
 
-	init(notebook: Notebook, coreDataStack: CoreDataStack) {
+	init(notebook: Notebook, coredataStack: CoreDataStack) {
 		self.notebook = notebook
 		self.notes = (notebook.notes?.array as? [Note]) ?? []
-		self.coreDataStack = coreDataStack
+		self.coredataStack = coredataStack
 		super.init(nibName: "NewNotesListViewController", bundle: nil)
+        
+        title = "List"
 	}
 
 	required init?(coder aDecoder: NSCoder) {
@@ -46,7 +48,7 @@ class NewNotesListViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		title = "Notas"
+		title = "Notes"
 		self.view.backgroundColor = .white
 
 		let nib = UINib(nibName: "NotesListCollectionViewCell", bundle: nil)
@@ -54,81 +56,19 @@ class NewNotesListViewController: UIViewController {
 
 		collectionView.backgroundColor = .lightGray
 
-		let addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNote))
-		let exportButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(exportCSV))
-
-		self.navigationItem.rightBarButtonItems = [addButtonItem, exportButtonItem]
+        setupCollectionView()
 	}
+    
+    private func setupCollectionView() {
+        collectionView.dataSource = self
+        collectionView.delegate = self
+    }
 
 	// MARK: Helper methods
-
-	@objc private func exportCSV() {
-
-		coreDataStack.storeContainer.performBackgroundTask { [unowned self] context in
-
-			var results: [Note] = []
-
-			do {
-				results = try self.coreDataStack.managedContext.fetch(self.notesFetchRequest(from: self.notebook))
-			} catch let error as NSError {
-				print("Error: \(error.localizedDescription)")
-			}
-
-			let exportPath = NSTemporaryDirectory() + "export.csv"
-			let exportURL = URL(fileURLWithPath: exportPath)
-			FileManager.default.createFile(atPath: exportPath, contents: Data(), attributes: nil)
-
-			let fileHandle: FileHandle?
-			do {
-				fileHandle = try FileHandle(forWritingTo: exportURL)
-			} catch let error as NSError {
-				print(error.localizedDescription)
-				fileHandle = nil
-			}
-
-			if let fileHandle = fileHandle {
-				for note in results {
-					fileHandle.seekToEndOfFile()
-					guard let csvData = note.csv().data(using: .utf8, allowLossyConversion: false) else { return }
-					fileHandle.write(csvData)
-				}
-
-				fileHandle.closeFile()
-				DispatchQueue.main.async { [weak self] in
-					self?.showExportFinishedAlert(exportPath)
-				}
-
-			} else {
-				print("no podemos exportar la data")
-			}
-		}
-
-	}
-
-	private func showExportFinishedAlert(_ exportPath: String) {
-		let message = "El archivo CSV se encuentra en \(exportPath)"
-		let alertController = UIAlertController(title: "Exportacion terminada", message: message, preferredStyle: .alert)
-		let dismissAction = UIAlertAction(title: "Dismiss", style: .default)
-		alertController.addAction(dismissAction)
-
-		present(alertController, animated: true)
-	}
-
-	private func notesFetchRequest(from notebook: Notebook) -> NSFetchRequest<Note> {
-		let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
-		//fetchRequest.fetchBatchSize = 50
-		fetchRequest.predicate = NSPredicate(format: "notebook == %@", notebook)
-		fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-
-		return fetchRequest
-	}
-
-	@objc private func addNote() {
-		let newNoteVC = NoteDetailsViewController(kind: .new(notebook: notebook), managedContext: coreDataStack.managedContext)
-		newNoteVC.delegate = self
-		let navVC = UINavigationController(rootViewController: newNoteVC)
-		self.present(navVC, animated: true, completion: nil)
-	}
+    
+    func update(with notes: [Note]) {
+        self.notes = notes
+    }
 
 }
 
@@ -151,8 +91,9 @@ extension NewNotesListViewController: UICollectionViewDataSource {
 
 extension NewNotesListViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		let detailVC = NoteDetailsViewController(kind: .existing(note: notes[indexPath.row]), managedContext: coreDataStack.managedContext)
-		detailVC.delegate = self
+		let detailVC = NoteDetailsViewController(kind: .existing(note: notes[indexPath.row]), managedContext: coredataStack.managedContext)
+		//detailVC.delegate = self
+        detailVC.delegate = tabBarController as! NotesListTabBarController
 		//self.show(detailVC, sender: nil)
 
 		// custom animation

@@ -18,7 +18,7 @@ public class Note: NSManagedObject {
 extension Note {
 
 	func csv() -> String {
-		let exportedTitle = title ?? "Sin Titulo"
+		let exportedTitle = title ?? "Without Title"
 		let exportedText = text ?? ""
 		let exportedCreationDate = (creationDate as Date?)?.customStringLabel() ?? "ND"
 

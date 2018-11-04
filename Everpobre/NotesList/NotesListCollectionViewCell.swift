@@ -12,7 +12,8 @@ class NotesListCollectionViewCell: UICollectionViewCell {
 
 	@IBOutlet weak var titleLabel: UILabel!
 	@IBOutlet weak var creationDateLabel: UILabel!
-
+    @IBOutlet weak var imageView: UIImageView!
+    
 	var item: Note!
 
 	override func awakeFromNib() {
@@ -23,5 +24,8 @@ class NotesListCollectionViewCell: UICollectionViewCell {
 		backgroundColor = .white
 		titleLabel.text = item.title
 		creationDateLabel.text = (item.creationDate as Date?)?.customStringLabel()
+        if let imageData = item.image, imageData.length > 0 {
+            imageView.image = UIImage(data: imageData as Data)
+        }
 	}
 }

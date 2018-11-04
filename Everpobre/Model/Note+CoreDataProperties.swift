@@ -23,5 +23,7 @@ extension Note {
     @NSManaged public var title: String?
     @NSManaged public var image: NSData?
     @NSManaged public var notebook: Notebook?
+    @NSManaged public var location: Location?
+    @NSManaged public var tags: String?
 
 }
